@@ -1,0 +1,147 @@
+---
+title: "PRACTICA_11_S3"
+author: "Nelson de Jesus Magaña Godinez"
+date: "19/8/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\textbf{Ejemplo:}
+
+El tiempo que tarda un sistema informático en red en ejecutar una instrucción depende del número de usuarios conectados a él. Sí no hay usuarios el tiempo es cero. Se tienen registrados los siguientes
+datos:
+\begin{center}
+\begin{tabular}{| c | c |}
+\hline
+No. usuarios & tiempo de ejecucion \\ \hline
+10 & 1.0 \\
+15 & 1.2 \\
+20 & 2.0 \\
+20 & 2.1 \\
+25 & 2.2 \\
+30 & 2.0 \\
+30 & 1.9 \\ \hline
+\end{tabular}
+\end{center}
+\vspace{0.3cm}
+\textbf{REALICE UN ANÁLISIS ESTADÍSTICO.}
+\vspace{0.3cm}
+
+1) Activa tu directorio de trabajo
+```{r}
+getwd()
+```
+\vspace{0.3cm}
+
+2) Crea un nuevo script y llámale "Script11-DatosBivariados4"
+\vspace{0.3cm}
+
+3) Crea los dos vectores para las dos variables
+```{r}
+# Número de usuarios = Variable explicativa o independiente
+usuarios <- c(10, 15, 20, 20, 25, 30, 30);
+usuarios
+tiempo <-c(1.0, 1.2, 2.0, 2.1, 2.2, 2.0, 1.9) 
+tiempo
+```
+\vspace{0.3cm}
+
+4) Crea una hoja de datos que tenga como componentes o columnas los dos vectores.
+```{r}
+Sistema <- data.frame(usuarios = usuarios, tiempo = tiempo)
+Sistema
+# Para editar o ampliar los datos puede utilizar la función fix()
+fix(Sistema)
+```
+\vspace{0.3cm}
+
+5) Guarda la hoja de datos en un archivo.
+```{r}
+write.table(Sistema, file = "Sistema.txt", append = FALSE, quote = TRUE,
+            sep = " ", na = "NA", col.names = TRUE)
+```
+\vspace{0.3cm}
+
+6) Elimina los objetos almacenados en el área de trabajo (Workspace).
+
+ls(); rm(list=ls(all=TRUE)); ls()
+```{r}
+ls()
+#rm(list = ls(all = TRUE))
+ls
+```
+\vspace{0.3cm}
+
+7) Recupera la hoja de datos.
+```{r}
+sistema <-read.table("sistema.txt", header = TRUE);
+sistema
+```
+\vspace{0.3cm}
+
+8) Conecta la hoja de datos a la segunda ruta o lista de búsqueda.
+```{r}
+attach(Sistema, pos = 2)
+search()
+```
+\vspace{0.3cm}
+
+9) Muestra un resumen de principales estadísticos de las variables.
+```{r}
+summary(Sistema)
+cov(Sistema) # Matriz de covarianza
+cor(Sistema, use = "all.obs", method = "pearson") # Matriz de correlaciones
+```
+\vspace{0.3cm}
+
+10) Elabora un gráfico de dispersión para analizar alguna relación entre las variables.
+```{r}
+plot(usuarios, tiempo, xlim = c(5, 35), ylim = c(0.0, 2.5), type = "p",
+     pch = 1, col = "blue", 
+     main = "Grafico de dispersion (Usuarios, Tiempo)", 
+     xlab = "Numero de usuarios", ylab = "Tiempo de ejecucion")
+```
+\vspace{0.3cm}
+
+11) Para identificar un punto arbitrario, se procede de la siguiente manera:
+```{r}
+plot(usuarios, tiempo, xlim = c(5, 35), ylim = c(0.0, 2.5), type = "p",
+     pch = 1, col = "blue", 
+     main = "Grafico de dispersion (Usuarios, Tiempo)", 
+     xlab = "Numero de usuarios", ylab = "Tiempo de ejecucion")
+#Sin cerrar la ventana del gráfico anterior, ejecuta la siguiente instrucción
+identify(usuarios, tiempo, n=1)# n=1 indica que solamente será un punto seleccionado
+# Y luego selecciona un punto en el gráfico haciendo clic con el ratón.
+# Esto es útil para identificar puntos que podrían ser atípicos.
+# Deberá aparecer en la R-Console el índice que corresponde a este punto.
+```
+\vspace{0.3cm}
+
+12) Aplica la función lm() para encontrar el modelo lineal que se ajusta a los datos.
+```{r}
+reg.Y.X <- lm(tiempo~ -1+usuarios, Sistema, na.action = NULL,
+              method = "qr", model = TRUE)
+#-1 indica que no se toma en cuenta la constante en el modelo.
+summary(reg.Y.X)
+```
+
+\# Note que es necesaria la instrucción anterior para poder visualizar los resultados más sobresalientes de la regresión encontrada. Nos muestra la estimación de los parámetros junto con su significancia, el coeficiente de determinación.
+\vspace{0.3cm}
+
+13) Agrega la recta de regresión al gráfico de dispersión.
+```{r}
+#abline(reg.Y.X)
+# Observación: Alternativamente si quiere una recta más "exacta" use:
+line(usuarios, 0.09437*usuarios)
+```
+\vspace{0.3cm}
+
+14) Efectúa una análisis de variabilidad del modelo o descomposición de la varianza.
+```{r}
+reg.anova <- anova(reg.Y.X)
+reg.anova
+```
+Se optiene un P-valor menor que 0.05 por lo tanto la varianzas no presentan homogeneidad entre los grupos. 
