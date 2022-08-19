@@ -1,0 +1,270 @@
+\documentclass{article}
+
+\begin{document}
+
+\begin{center}\textbf{UNIVERSIDAD DE EL SALVADOR.} \end{center}
+\begin{center}\textbf{FACULTAD MULTIDISCIPLINARIA DE OCCIDENTE.} \end{center}
+\begin{center}\textbf{DEPARTAMENTO DE MATEMATICAS.} \end{center}
+\begin{center}\includegraphics[width=0.4\textwidth]{251} \end{center}
+\begin{center} PRACTICA 8. SEMANA 3\end{center}
+\vspace{0.5cm}
+\begin{center}\textbf{CARRERA:} \end{center}
+\begin{center}\textbf{LICENCIATURA EN ESTADISTICA.} \end{center}
+\vspace{0.5cm}
+\begin{center}\textbf{ASIGNATURA:} \end{center}
+\begin{center}\textbf{ANALISIS ESTADISTICO CON EL PAQUETE R} \end{center}
+\vspace{0.5cm}
+\begin{center}\textbf{DOCENTE:} \end{center}
+\begin{center}\textbf{JAIME ISAAC PEÑA} \end{center}
+\vspace{0.5cm}
+\begin{center}\textbf{PRESENTADO POR:} \end{center}
+\begin{center}\textbf{NELSON DE JESUS MAGAÑA GODINEZ} \end{center}
+\vspace{0.5cm}
+\begin{center}\textbf{FECHA:} \end{center}
+\begin{center}\textbf{16 AGOSTO DE 2022} \end{center}
+\newpage
+
+\textbf{ANÁLISIS ESTADÍSTICO DE LOS DATOS.}
+\vspace{0.4cm}
+
+1) Visualiza el directorio por defecto y activa su directorio de trabajo
+<<>>=
+getwd()
+setwd("C:/Users/pc 1/Desktop/PAQUETE R/PRACTICAS_S3")
+@
+\vspace{0.3cm}
+
+2) Crea un nuevo Script y llámale "Script08-DatosContinuos"
+\vspace{0.3cm}
+
+3) Crea el vector que contendrá los datos.
+<<>>=
+Notas <- c(4.47, 4.47, 3.48, 5.0, 3.42, 3.78, 3.1, 3.57, 4.2, 4.5,
+3.6, 3.75, 4.5, 2.85, 3.7, 4.2, 3.2, 4.05, 4.9, 5.1,
+5.3, 4.16, 4.56, 3.54, 3.5, 5.2, 4.71, 3.7, 4.78, 4.14,
+4.14, 4.8, 4.1, 3.83, 3.6, 2.98, 4.32, 5.1, 4.3, 3.9,
+3.96, 3.54, 4.8, 4.3, 3.39, 4.47, 3.19, 3.75, 3.1, 4.7,
+3.69, 3.3, 2.85, 5.25, 4.68, 4.04, 4.44, 5.43, 3.04, 2.95);
+Notas
+data.entry(Notas)
+Notas
+length(Notas)
+@
+\vspace{0.3cm}
+
+4) Guarda el vector de datos en un archivo.
+<<>>=
+write(Notas, "Notas.txt")
+@
+\vspace{0.3cm}
+
+5) Limpia el área de trabajo (Workspace)
+<<>>=
+ls()
+#rm(list = ls(all=TRUE))
+ls()
+@
+\space{0.3cm}
+
+6) Lee o recupera el vector de datos desde el archivo de texto.
+<<>>=
+X<-scan("Notas.txt", what = double(0), na.strings = "NA", flush = FALSE)
+ls()
+# Si el vector contiene valores reales se ocupa: what = double(0)
+@
+\vspace{0.3cm}
+
+7) Crear una tabla de frecuencia.
+<<>>=
+# Define el número k de los intervalos o clases.
+# Usa el Método de Herbert A. Sturges para determinar dicho número.
+n <- length(X);
+n
+k <- 1+3.322*logb(n, 10);
+k
+k <- round(k);
+k
+# Calcula el ancho o amplitud a de cada intervalo a=rango/k
+rango <- max(X)-min(X);
+rango
+a <- rango/k;
+a
+a <-round(a, 3);
+a
+
+# Define los límites y puntos medios de cada uno de los k intervalos
+limites <- seq(from = min(X)-0.01/2, to = max(X)+0.01/2, by = a);
+limites
+options(digits = 4)
+ci <- cbind(1:k);
+ci
+for (i in 2:length(limites)) {
+  ci[i-1, 1] <-limites[i] + (limites[i-1])/2
+}
+ci
+# Encuentra las frecuencias absolutas fi para cada intervalo.
+options(digits = 2)
+fi <- cbind(table(cut(X, breaks = limites, labels=NULL,
+                      include.lowest=FALSE, right=FALSE, digit.lab=4)));
+fi
+@
+\vspace{0.3cm}
+
+\textbf{breaks} es un vector o secuencia de cortes 1:6, o el número de clases.
+\vspace{0.3cm}
+
+\textbf{labels} indica que no hay nombres para los intervalos o clases, por defecto las etiquetas tienen la notación (a, b].
+\vspace{0.3cm}
+
+\textbf{include.lowest} indica que si un X[i] es igual al corte inferior (0 superior, para right=FALSE) el valor debe ser incluido.
+\vspace{0.3cm}
+
+\textbf{right} indica que sí el intervalo debe ser cerrado a la derecha y abierto a la izquierda, o viceversa.
+\vspace{0.3cm}
+
+\textbf{dig.lab} es un entero el cual es usado cuando las etiquetas no son dadas, determina el número de dígitos usado en el formato de números de cortes.
+\vspace{0.3cm}
+<<>>=
+# Encuentra las frecuencias relativas o proporciones fri.
+options(digits = 4)
+fri <- fi/n;
+fri
+# Encuentra las frecuencias acumuladas ascendentes Fi
+options(digits = 2)
+Fi <- cumsum(fi);
+Fi
+# Encuentra las frecuencias relativas acumuladas Fri
+options(digits = 4)
+Fri <- Fi/n;
+Fri
+# Completa la tabla de frecuencias.
+Tabla.Frec <- data.frame(ci=ci, fi=fi, fri=fri, Fi=Fi, Fri=Fri);
+Tabla.Frec
+# Nuevamente puede usar el comando xtable para importar a código LATEX.
+@
+\vspace{0.3cm}
+
+8) Crea el histograma de frecuencias.
+<<>>=
+h <- hist(X, breaks = c(limites[1]-a, limites, limites[k+1]+a), 
+          freq = TRUE, probability = FALSE, include.lowest = FALSE,
+          right = TRUE, main = "Histograma de frecuencias", 
+          col="lightyellow", lty = 1, border = "purple", 
+          xlab = " Notas de aspirantes", ylab = "Frecuencia (fi)",
+axes = TRUE, labels = FALSE)
+text(h$mids, h$density, h$counts, adj = c(0.5, -0.5), col = "red")
+rug(jitter(X)) # adiciona marcas de los datos
+# h es un objeto del tipo lista que contiene atributos del histograma
+is.list(h);
+h
+@
+\vspace{0.3cm}
+
+9) Aproxima al histograma la función de densidad normal
+<<>>=
+h <- hist(X, breaks=c(limites[1]-a, limites, limites[k+1]+a), 
+          freq = FALSE, probability = TRUE, include.lowest = FALSE,
+          right = TRUE, main = "Aproximación a una Normal\n", 
+          col = "lightyellow", lty = 1, border = "purple",
+          xlab = "Notas de aspirantes\n", 
+          ylab = "Frecuencia relativa (fri)", axes = TRUE, 
+          labels = FALSE)
+text(h$mids, h$density, h$counts, adj = c(0.5, 0.2), col = "red")
+rug(jitter(X)) # adiciona marcas de los datos
+curve(dnorm(x, mean = mean(X), sd = sd(X)), col = 2, lty = 2,lwd = 2, add = TRUE)
+@
+\vspace{0.3cm}
+
+10) Crea el polígono de frecuencias
+<<>>=
+h <- hist(X, breaks = c(limites[1]-a, limites, limites[k+1]+a),
+          freq = TRUE, probability = FALSE, include.lowest = FALSE,
+          right = TRUE, main = "Poligono de frecuencia", col = "pink", 
+          lty = 1, border = "black", xlab = "Notas de aspirantes", 
+          ylab = "frecuencia (fi)", axes = TRUE, labels = FALSE)
+text(h$mids, h$density, h$counts, adj = c(0.5, -0.5), col = "red")
+rug(jitter(X)) # Adiciona marcas a los datos
+vCi <- c(h$mids[1]-a, h$mids, h$mids[k+1]+a);
+vCi
+vfi <- c(0, h$counts, 0); 
+vfi
+lines(vCi, vfi, col = "blue", type = "l")
+@
+\vspace{0.3cm}
+
+11) Crea la Ojiva ascendente o polígono de frecuencias acumuladas ascendentes
+<<>>=
+Fia <- c(0, Fi);
+Fia
+plot(limites, Fia, type = "p", pch = 1, col ="blue", 
+     main = "Ojiva ascendente", xlab = "Notas de aspirantes", 
+     ylab = "Frecuencia acumulada (Fi)")
+text(limites, h$density, Fia, adj = c(0.5, -0.5), col = "red")
+lines(limites, Fia, col = "black", type = "l")
+@
+\vspace{0.3cm}
+
+12) Calcula los principales estadísticos descriptivos de la variable
+<<>>=
+# Calcula la moda, ya que el R no proporciona una función para eso.
+options(digits = 4)
+for (i in 1:k) 
+  if(fi[i] == max(fi)) 
+    break()
+if(i > 1)moda <- limites[i]+((fi[i]-fi[i-1])/((fi[i]-fi[i-1])+(fi[i]-fi[i+1])))*a
+else 
+  moda <- limites[i]+(fi[i]/(fi[i]+(fi[i]-fi[i+1])))*a
+moda
+@
+
+<<>>=
+# Calcula los cuartiles: Q1, Q2, Q3
+Q <- 1:3
+for(v in 1:3) for(i in 1:k) if (Fi[i] > (v*25*n)/100)
+{
+Q[v] <- limites[i]+(((25*v*n/100)-Fi[i-1])/fi[i])*a
+break
+}
+Q
+@
+
+<<>>=
+# Calcula los principales estadísticos.
+#estadisticos <- rbind(media = sum(tabEstad$cifi)/n, moda = moda, Q1 = Q[1], Q2 = Q[2], Q3 = Q[3], rango = max(X) - min(X), varianza = sum(tabEstad$ciMedia2fi)/n, Desviacion = sqrt(sum(tabEstad$ciMedia2fi)/n), CoeficienteVariacion = sqrt(su (tabEstad$ciMedia2fi)/n)/(sum(tabEstad$cifi)/n), CAfisher=(sum(tabEstad$ciMedia3fi)/n)/sqrt(sum(tabEstad$ciMedia2fi)/n)^3, CoeficienteCurtosis=((sum(tabEstad$ciMedia4fi)/n)/sqrt(sum(tabEstad$ciMedia2fi)/n)^4)-3)
+#estadisticos
+@
+\vspace{0.3cm}
+
+13) Otros gráficos:
+<<>>=
+# Grafico de cajas.
+boxplot(X, main = "Grafico de caja", xlab = "Notas", notch = FALSE,
+        data =parent.frame(), plot = TRUE, border = "red", 
+        col = "green", horizontal = TRUE)
+@
+\vspace{0.3cm}
+
+\textbf{Observación: en la función boxplot(), sí plot es FALSE se produce un resumen de los valores
+(los cinco números).}
+\vspace{0.3cm}
+
+\# Una variante del boxplot, es el notched boxplot de McGill, Larsen y Tukey, el cual adiciona intervalos de confianza para la mediana, representados con un par de cuñas a los lados de la
+caja:
+<<>>=
+windows()
+boxplot(X, main = "Grafico de caja", xlab = "X = notas", notch = TRUE,
+        data = parent.frame(), plot = TRUE, border = "black",
+        col = "purple", horizontal = TRUE)
+@
+\vspace{0.3cm}
+
+\# Varios gráficos en una misma ventana
+<<>>=
+par(mfrw = c(1, 2)) # Divide la ventana gráfica en dos partes 
+#(1 fila, 2 columnas)
+mtext(side = 3, line = 0, cex = 2, outer = T, "Titulo para tota la pagina")
+hist(X);
+boxplot(X)
+@
+
+\end{document}
